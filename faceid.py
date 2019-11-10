@@ -69,13 +69,9 @@ def addKnownFace(image):
     pass
 
 
-def faceID(marvin_face, dan_face, testFace, sms_client, imgur_response_object):
-    marvin_face_encoding = marvin_face
-    dan_face_encoding = dan_face
-    unknown_face_encoding = testFace
+def faceID(marvin_face_encoding, dan_face_encoding, unknown_face_encoding, sms_client, imgur_response_object):
 
     testMarvin = fr.compare_faces(marvin_face_encoding, unknown_face_encoding)
-
     if testMarvin[0]:
         notifyPhone('Marvin', sms_client, imgur_response_object)
     else:
