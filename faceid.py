@@ -1,9 +1,10 @@
-import face_recognition as fr
-import cv2
 import time
-import datetime
+from datetime import datetime
+import cv2
+import face_recognition as fr
 from twilio.rest import Client
 from imgurpython import ImgurClient
+
 
 def initTwilio():
     # Your Account SID from twilio.com/console
@@ -14,24 +15,43 @@ def initTwilio():
     client = Client(account_sid, auth_token)
     return client
 
+
 def initImgur():
-    client_id = '0cdef4993f98863'
-    client_secret = '810c1862f54a8a9038220d4de00c6cb2449ad620'
+    #Initializes Imgur API
+    client_id = '60ae326f632d9a9'
+    client_secret = 'd0db53bd5630697cca43b187a0572e26efb54037'
     imgurClient = ImgurClient(client_id, client_secret)
     return imgurClient
 
-def notifyPhone(client, picture, name, imgur):
+
+def notifyPhone(name, client, imgur_response_object):
     #sends picture and text to phone with ID
+    #passes uploaded image Imgur link to URL
     message = client.messages.create(
         to="+19737479013",
         from_="+17853284264",
         body=f'{name} is accessing your computer.',
-        media_url=(imgur['link']))
+        media_url=(imgur_response_object['link']))
+
 
 def getCamera():
     camera = cv2.VideoCapture(0)
     time.sleep(2)
     return camera
+
+
+def deleteImage():
+    pass
+
+
+def saveDeleteHash(imgur_response_object):
+    with open('./deletehashes/deletehashes.txt', 'a') as f:
+        f.write(f'\n{imgur_response_object['deletehash']}\n')
+
+
+def uploadToImgur(path, imgur_client):
+    imgur_response_object = imgur_client.upload_from_path(path, config=None, anon=True)
+    return imgur_response_object
 
 
 def releaseCamera(camera):
@@ -40,33 +60,53 @@ def releaseCamera(camera):
 
 def takePicture(camera):
     success, frame = camera.read()
-    path = './img/unknown/img{}.png'.format(datetime.datetime.now())
+    path = './img/unknown/img{}.png'.format(datetime.now())
     cv2.imwrite(path, frame)
     return frame, path
+
 
 def addKnownFace(image):
     pass
 
+
+def faceID(marvin_face, dan_face, testFace, sms_client, imgur_response_object):
+    marvin_face_encoding = marvin_face
+    dan_face_encoding = dan_face
+    unknown_face_encoding = testFace
+
+    testMarvin = fr.compare_faces(marvin_face_encoding, unknown_face_encoding)
+
+    if testMarvin[0]:
+        notifyPhone('Marvin', sms_client, imgur_response_object)
+    else:
+        testDan = fr.compare_faces(dan_face_encoding, unknown_face_encoding)
+        if testDan[0]:
+            notifyPhone('Daniel', sms_client, imgur_response_object)
+        else:
+            notifyPhone('Unknown person', sms_client, imgur_response_object)
+
+
 def main():
     #starting messaging and upload services
     sms_client = initTwilio()
-    mms_client = initImgur()
+    imgur_client = initImgur()
 
     #take picture
     cam = getCamera()
     frame, path = takePicture(cam)
+    releaseCamera(cam)
 
-    #upload picture
-    imgur = mms_client.upload_from_path(path, config=None, anon=True)
+    imgur_response_object = uploadToImgur(path, imgur_client)
+    saveDeleteHash(imgur_response_object)
 
     #load known faces
-    #dan_image = fr.load_image_file('./img/known/Daniel Novikov.png')
+    dan_image = fr.load_image_file('./img/known/Daniel Novikov.png')
     marvin_image = fr.load_image_file('./img/known/marvin.jpg')
     unknown_image = fr.load_image_file(path)
 
     #encode faces for faceID algorithm
     try:
-        #dan_face_encoding = fr.face_encodings(dan_image)[0]
+        dan_face_encoding = fr.face_encodings(dan_image)[0]
         marvin_face_encoding = fr.face_encodings(marvin_image)[0]
         unknown_face_encoding = fr.face_encodings(unknown_image)[0]
     except IndexError:
@@ -74,15 +114,11 @@ def main():
         quit()
 
     #Compare face encondings with known faces and send results over sms
-    #results = fr.compare_faces([dan_face_encoding], unknown_face_encoding)
-    results = fr.compare_faces([marvin_face_encoding], unknown_face_encoding)
-    if results[0]:
-        #notifyPhone(sms_client, 0, 'Daniel')
-        notifyPhone(sms_client, 0, 'Marvin', imgur)
-    else:
-        notifyPhone(sms_client, 0, 'Unknown person', imgur)
-
-    releaseCamera(cam)
+    faceID([marvin_face_encoding],
+            [dan_face_encoding],
+            unknown_face_encoding,
+            sms_client,
+            imgur_response_object)
 
 
 if __name__ == "__main__":
