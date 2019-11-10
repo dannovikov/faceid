@@ -11,7 +11,6 @@ def initTwilio():
     account_sid = 'AC1987dfb59ace010634e69ba5f01bd734'
     # Your Auth Token from twilio.com/console
     auth_token  = '9a556d22940430df20a7f596a64bc230'
-
     client = Client(account_sid, auth_token)
     return client
 
@@ -65,17 +64,13 @@ def takePicture(camera):
     return frame, path
 
 
-def addKnownFace(image):
-    pass
+def faceID(marvin, dan, unknown, sms_client, imgur_response_object):
 
-
-def faceID(marvin_face_encoding, dan_face_encoding, unknown_face_encoding, sms_client, imgur_response_object):
-
-    testMarvin = fr.compare_faces(marvin_face_encoding, unknown_face_encoding)
+    testMarvin = fr.compare_faces(marvin, unknown)
     if testMarvin[0]:
         notifyPhone('Marvin', sms_client, imgur_response_object)
     else:
-        testDan = fr.compare_faces(dan_face_encoding, unknown_face_encoding)
+        testDan = fr.compare_faces(dan, unknown)
         if testDan[0]:
             notifyPhone('Daniel', sms_client, imgur_response_object)
         else:
