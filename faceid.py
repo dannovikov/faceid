@@ -27,7 +27,7 @@ def notifyPhone(name, client, imgur_response_object):
     #sends picture and text to phone with ID
     #passes uploaded image Imgur link to URL
     message = client.messages.create(
-        to="+19737479013",
+        to="+12016632797",
         from_="+17853284264",
         body=f'{name} is accessing your computer.',
         media_url=(imgur_response_object['link']))
@@ -45,7 +45,7 @@ def deleteImage():
 
 def saveDeleteHash(imgur_response_object):
     with open('./deletehashes/deletehashes.txt', 'a') as f:
-        f.write(f'\n{imgur_response_object['deletehash']}\n')
+        f.write('\n{}\n'.format(imgur_response_object['deletehash']))
 
 
 def uploadToImgur(path, imgur_client):
@@ -66,13 +66,14 @@ def takePicture(camera):
 
 def faceID(marvin, dan, unknown, sms_client, imgur_response_object):
 
-    testMarvin = fr.compare_faces(marvin, unknown)
-    if testMarvin[0]:
-        notifyPhone('Marvin', sms_client, imgur_response_object)
+    
+    testDan = fr.compare_faces(dan, unknown)
+    if testDan[0]:
+        notifyPhone('Daniel', sms_client, imgur_response_object)
     else:
-        testDan = fr.compare_faces(dan, unknown)
-        if testDan[0]:
-            notifyPhone('Daniel', sms_client, imgur_response_object)
+        testMarvin = fr.compare_faces(marvin, unknown)
+        if testMarvin[0]:
+            notifyPhone('Marvin', sms_client, imgur_response_object)
         else:
             notifyPhone('Unknown person', sms_client, imgur_response_object)
 
