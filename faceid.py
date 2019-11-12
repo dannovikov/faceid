@@ -66,12 +66,12 @@ def takePicture(camera):
 
 def faceID(marvin, dan, unknown, sms_client, imgur_response_object):
 
+    testDan = fr.compare_faces(dan, unknown, tolerance = 0.5)
     
-    testDan = fr.compare_faces(dan, unknown)
     if testDan[0]:
         notifyPhone('Daniel', sms_client, imgur_response_object)
     else:
-        testMarvin = fr.compare_faces(marvin, unknown)
+        testMarvin = fr.compare_faces(marvin, unknown, tolerance=0.5)
         if testMarvin[0]:
             notifyPhone('Marvin', sms_client, imgur_response_object)
         else:
