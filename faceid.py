@@ -45,7 +45,7 @@ def deleteImage():
 
 def saveDeleteHash(imgur_response_object):
     with open('./deletehashes/deletehashes.txt', 'a') as f:
-        f.write('\n{}\n'.format(imgur_response_object['deletehash']))
+        f.write('\n{}'.format(imgur_response_object['deletehash']))
 
 
 def uploadToImgur(path, imgur_client):
