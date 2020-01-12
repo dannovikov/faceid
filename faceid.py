@@ -17,8 +17,8 @@ def initTwilio():
 
 def initImgur():
     #Initializes Imgur API
-    client_id = '60ae326f632d9a9'
-    client_secret = 'd0db53bd5630697cca43b187a0572e26efb54037'
+    client_id = #YOUR CLIENT ID
+    client_secret = #YOUR SECRET
     imgurClient = ImgurClient(client_id, client_secret)
     return imgurClient
 
