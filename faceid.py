@@ -8,9 +8,9 @@ from imgurpython import ImgurClient
 
 def initTwilio():
     # Your Account SID from twilio.com/console
-    account_sid = 'AC1987dfb59ace010634e69ba5f01bd734'
+    account_sid = #Your Twilio SID
     # Your Auth Token from twilio.com/console
-    auth_token  = '9a556d22940430df20a7f596a64bc230'
+    auth_token  = #Your Twilio Token
     client = Client(account_sid, auth_token)
     return client
 
@@ -27,8 +27,8 @@ def notifyPhone(name, client, imgur_response_object):
     #sends picture and text to phone with ID
     #passes uploaded image Imgur link to URL
     message = client.messages.create(
-        to="+12016632797",
-        from_="+17853284264",
+        to="5",  #Replace 5 with destination number
+        from_="+1", # Add your Twilio number here
         body=f'{name} is accessing your computer.',
         media_url=(imgur_response_object['link']))
 
@@ -63,7 +63,7 @@ def takePicture(camera):
     cv2.imwrite(path, frame)
     return frame, path
 
-
+#Change names accordingly
 def faceID(marvin, dan, unknown, sms_client, imgur_response_object):
 
     testDan = fr.compare_faces(dan, unknown, tolerance = 0.5)
@@ -92,8 +92,8 @@ def main():
     saveDeleteHash(imgur_response_object)
 
     #load known faces
-    dan_image = fr.load_image_file('./img/known/Daniel Novikov.png')
-    marvin_image = fr.load_image_file('./img/known/marvin.jpg')
+    dan_image = fr.load_image_file('./img/known/dan.png')   #Replace with your known image file
+    marvin_image = fr.load_image_file('./img/known/marvin.jpg') #
     unknown_image = fr.load_image_file(path)
 
     #encode faces for faceID algorithm
